@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards Từ Vựng Tiếng Anh - The Home</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .card {
+      width: 330px;
+      height: 410px;
+      background: #ffffff;
+      border-radius: 25px;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+      border: 5px solid #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px 20px;
+    }
+
+    .icon {
+      font-size: 5rem;
+      margin-top: 10px;
+    }
+
+    .text-container {
+      text-align: center;
+    }
+
+    .word {
+      font-size: 2.1rem;
+      font-weight: bold;
+      color: #ff6b6b;
+      margin-bottom: 8px;
+    }
+
+    .meaning {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #6c5ce7;
+    }
+
+    .btn-audio {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .btn-audio:hover {
+      background: #ee5253;
+      transform: scale(1.05);
+    }
+
+    .controls {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .btn-nav {
+      background: #6c5ce7;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-nav:hover {
+      background: #5b4bc4;
+      transform: scale(1.05);
+    }
+
+    .progress {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2c3e50;
+      background: rgba(255,255,255,0.7);
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🏠 The Home 🏡</h1>
+
+  <div class="card">
+    <div class="icon" id="icon">📍</div>
+    
+    <div class="text-container">
+      <div class="word" id="word">address</div>
+      <div class="meaning" id="meaning">địa chỉ</div>
+    </div>
+
+    <button class="btn-audio" onclick="speakCurrentWord()">🔊 Nghe đọc</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn-nav" onclick="prevCard()">◄ Trước</button>
+    <div class="progress" id="progress">1 / 20</div>
+    <button class="btn-nav" onclick="nextCard()">Sau ►</button>
+  </div>
+
+  <script>
+    const vocabulary = [
+      { word: "address", meaning: "địa chỉ", icon: "📍" },
+      { word: "balcony", meaning: "ban công", icon: "🏢" },
+      { word: "basement", meaning: "tầng hầm", icon: "🏚️" },
+      { word: "blanket", meaning: "chăn / mền", icon: "🛋️" },
+      { word: "downstairs", meaning: "dưới nhà", icon: "👇" },
+      { word: "dream", meaning: "giấc mơ", icon: "💭" },
+      { word: "elevator (UK lift)", meaning: "thang máy", icon: "🛗" },
+      { word: "floor", meaning: "tầng / sàn nhà", icon: "🏢" },
+      { word: "internet", meaning: "mạng internet", icon: "🌐" },
+      { word: "lift (US elevator)", meaning: "thang máy", icon: "🛗" },
+      { word: "message", meaning: "tin nhắn", icon: "📩" },
+      { word: "roof", meaning: "mái nhà", icon: "🏠" },
+      { word: "seat", meaning: "chỗ ngồi / ghế", icon: "🪑" },
+      { word: "shower", meaning: "vòi hoa sen", icon: "🚿" },
+      { word: "stair(s)", meaning: "cầu thang", icon: "🪜" },
+      { word: "toothbrush", meaning: "bàn chải đánh răng", icon: "🪥" },
+      { word: "toothpaste", meaning: "kem đánh răng", icon: "🪥" },
+      { word: "towel", meaning: "khăn tắm", icon: "🧴" },
+      { word: "upstairs", meaning: "trên nhà", icon: "👆" },
+      { word: "wash", meaning: "rửa / giặt", icon: "🧼" }
+    ];
+
+    let currentIndex = 0;
+    const wordElement = document.getElementById('word');
+    const meaningElement = document.getElementById('meaning');
+    const iconElement = document.getElementById('icon');
+    const progressElement = document.getElementById('progress');
+
+    function updateCard() {
+      const item = vocabulary[currentIndex];
+      wordElement.textContent = item.word;
+      meaningElement.textContent = item.meaning;
+      iconElement.textContent = item.icon;
+      progressElement.textContent = `${currentIndex + 1} / ${vocabulary.length}`;
+    }
+
+    function prevCard() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCard();
+      }
+    }
+
+    function nextCard() {
+      if (currentIndex < vocabulary.length - 1) {
+        currentIndex++;
+        updateCard();
+      }
+    }
+
+    function speakCurrentWord() {
+      // Làm sạch chuỗi trước khi đọc (loại bỏ chú thích ngoặc đơn để phát âm tự nhiên)
+      const textToSpeak = vocabulary[currentIndex].word.replace(/\(.*?\)/g, '').replace('stair(s)', 'stairs');
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Khởi tạo thẻ đầu tiên
+    updateCard();
+  </script>
+</body>
+</html>
